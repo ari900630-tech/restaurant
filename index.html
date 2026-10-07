@@ -27,7 +27,7 @@ button{font:inherit;border:0;cursor:pointer}.game{position:fixed;inset:0}.game c
 @media(max-width:380px){.stat{min-width:61px;padding:5px 7px;font-size:12px}.restaurant-name{font-size:12px}.bottom{height:66px}.nav span{font-size:21px}}
 </style></head><body>
 <div id="game" class="game"></div>
-<div id="start"><div class="startcard"><div class="logo">👨‍🍳</div><h1>השף הגדול</h1><p>פתח מסעדה משלך, הושב לקוחות, קבל הזמנות, בשל, הגש, הרווח והפוך למסעדה המצליחה בעיר.</p><button class="startbtn" onclick="startGame()">פתח את המסעדה</button><div class="hint">ניהול • בישול • שדרוג • רווחים</div></div></div>
+<div id="start"><div class="startcard"><div class="logo">👨‍🍳</div><h1>השף הגדול</h1><p>פתח מסעדה משלך, הושב לקוחות, קבל הזמנות, בשל, הגש, הרווח והפוך למסעדה המצליחה בעיר.</p><button id="startBtn" class="startbtn" type="button">פתח את המסעדה</button><div class="hint">ניהול • בישול • שדרוג • רווחים</div></div></div>
 
 <div class="top">
 <button class="iconbtn" onclick="openPanel('orders')">🍽️</button>
@@ -79,7 +79,8 @@ function init(){
  window.addEventListener('resize',resize);animate();setTimeout(spawnOrder,1200);
 }
 function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}
-function startGame(){document.getElementById('start').style.display='none';started=true;init();toast('המסעדה נפתחה! הלקוח הראשון נכנס.');renderPanel('orders')}
+function startGame(){const btn=document.getElementById('startBtn');if(started)return;btn.disabled=true;btn.textContent='פותח את המסעדה...';if(typeof THREE==='undefined'){btn.disabled=false;btn.textContent='נסה שוב';return toast('המשחק עדיין נטען — נסה שוב בעוד רגע');}try{document.getElementById('start').style.display='none';started=true;init();toast('המסעדה נפתחה! הלקוח הראשון נכנס.');renderPanel('orders')}catch(e){started=false;document.getElementById('start').style.display='grid';btn.disabled=false;btn.textContent='נסה שוב';toast('אירעה תקלה בפתיחת המשחק')}}
+document.getElementById('startBtn').addEventListener('click',startGame);
 function spawnOrder(){if(!started)return;if(orders.length<5){const d=dishes[Math.floor(Math.random()*dishes.length)];orders.push({id:Date.now()+Math.random(),dish:d,tip:Math.floor(Math.random()*12)});sync()}renderPanel('orders');setTimeout(spawnOrder,4500+Math.random()*3500)}
 function openPanel(type){renderPanel(type);document.getElementById('panel').classList.add('show')}
 function closePanel(){document.getElementById('panel').classList.remove('show')}
