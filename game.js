@@ -1,4 +1,3 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js';
 const $=id=>document.getElementById(id),S=new THREE.Scene();S.background=new THREE.Color(0x76553f);S.fog=new THREE.Fog(0x76553f,30,65);
 const R=new THREE.WebGLRenderer({canvas:$('c'),antialias:true,powerPreference:'high-performance'});R.setPixelRatio(Math.min(devicePixelRatio,1.5));R.setSize(innerWidth,innerHeight);R.shadowMap.enabled=true;
 const C=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,100);C.position.set(10,13,15);
