@@ -1,66 +1,105 @@
 <!doctype html>
 <html lang="he" dir="rtl"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="version" content="2026-10-07-02"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><title>השף הגדול</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="version" content="2026-10-07-restaurant-ui-v3">
+<title>השף הגדול</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#18202b;font-family:Arial,sans-serif;touch-action:none}#g{position:fixed;inset:0}canvas{display:block}
-#hud{position:fixed;top:10px;left:10px;right:10px;z-index:4;display:flex;gap:7px;justify-content:flex-start;direction:rtl;pointer-events:none}.pill{background:#101722e8;color:white;padding:9px 12px;border-radius:16px;font-weight:800;border:1px solid #ffffff1f;backdrop-filter:blur(8px)}
-#menu{position:fixed;right:10px;top:10px;z-index:8;display:flex;gap:6px}button{border:0;border-radius:15px;padding:11px 13px;font-weight:800;font-size:14px;background:white;color:#18202b;box-shadow:0 6px 20px #0004}button:active{transform:scale(.96)}
-#orders{position:fixed;right:10px;top:58px;width:min(340px,calc(100vw - 20px));max-height:52vh;overflow:auto;z-index:7;background:#fffffff2;border-radius:20px;padding:10px;box-shadow:0 18px 50px #0005}.o{display:flex;align-items:center;gap:9px;background:#f1f4f7;padding:9px;border-radius:13px;margin:6px 0}.o b{flex:1}.o small{display:block;color:#657184}.o button{background:#e65a31;color:#fff;padding:8px 10px}
-#actions{position:fixed;bottom:12px;left:12px;right:12px;z-index:5;display:flex;justify-content:center;gap:7px}.act{background:#fff;min-width:76px;text-align:center}.act em{font-style:normal;font-size:20px;display:block}.act span{font-size:11px}
-#toast{position:fixed;bottom:92px;left:50%;transform:translateX(-50%);z-index:20;background:#111827eF;color:#fff;border-radius:18px;padding:11px 17px;font-weight:800;opacity:0;transition:.2s;white-space:nowrap}.show{opacity:1!important}
-#start{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#17202c,#34495e);padding:20px}.card{width:min(440px,100%);background:#fff;border-radius:30px;padding:28px 22px;text-align:center;box-shadow:0 30px 80px #0007}.logo{font-size:70px}.card h1{margin:5px 0;font-size:33px}.card p{color:#657184;line-height:1.5}.primary{width:100%;background:#e65a31;color:#fff;font-size:17px;padding:15px}
-#level{position:fixed;top:60px;left:10px;z-index:4;width:145px;height:7px;border-radius:10px;background:#ffffff40;overflow:hidden}.fill{height:100%;width:0;background:#f6c453}
-#stick{position:fixed;bottom:18px;right:18px;width:118px;height:118px;border-radius:50%;z-index:6;background:#ffffff22;border:2px solid #fff6}.knob{position:absolute;width:52px;height:52px;border-radius:50%;left:31px;top:31px;background:#ffffffd9;box-shadow:0 4px 18px #0004}
-#cook{position:fixed;inset:0;z-index:25;display:none;align-items:center;justify-content:center;background:#0008}.cookcard{background:white;border-radius:25px;padding:24px;width:min(380px,90%);text-align:center}.bar{height:12px;background:#e9edf1;border-radius:10px;overflow:hidden;margin:15px 0}.bar i{display:block;height:100%;width:0;background:#e65a31}
-@media(min-width:700px){#stick{right:35px}}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#e8dfd2;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;touch-action:none;color:#2b211b}
+button{font:inherit;border:0;cursor:pointer}.game{position:fixed;inset:0}.game canvas{display:block}
+.top{position:fixed;top:max(10px,env(safe-area-inset-top));left:10px;right:10px;height:58px;z-index:8;display:flex;align-items:center;gap:7px;pointer-events:none}
+.stat{min-width:72px;height:46px;padding:5px 10px;border-radius:15px;background:#fffaf4eF;border:1px solid #ffffff;box-shadow:0 4px 14px #49372a22;display:flex;align-items:center;gap:5px;font-weight:900;font-size:14px}.stat b{font-size:15px}.stat.gold{background:#fff3c9}
+.levelbox{position:absolute;right:0;top:52px;width:135px;height:7px;border-radius:10px;background:#0002;overflow:hidden}.levelbox i{display:block;height:100%;width:0;background:#e7a62b;border-radius:10px}
+.restaurant-name{position:absolute;left:50%;transform:translateX(-50%);background:#51362a;color:#fff7eb;padding:8px 15px;border-radius:18px;font-weight:900;box-shadow:0 4px 14px #0002;white-space:nowrap}
+.iconbtn{width:46px;height:46px;border-radius:15px;background:#fffaf4;color:#51362a;box-shadow:0 4px 14px #49372a22;font-size:21px;pointer-events:auto}.top .iconbtn:first-child{margin-right:auto}
+.side{position:fixed;right:10px;top:78px;z-index:7;display:flex;flex-direction:column;gap:8px}.side button{width:48px;height:48px;border-radius:15px;background:#fffaf4;box-shadow:0 4px 14px #49372a22;font-size:21px}
+.bottom{position:fixed;left:9px;right:9px;bottom:max(9px,env(safe-area-inset-bottom));z-index:9;height:70px;background:#fffaf4F2;border:1px solid #fff;border-radius:22px;box-shadow:0 8px 28px #3a281d35;display:grid;grid-template-columns:repeat(4,1fr);padding:5px;gap:5px}
+.nav{background:transparent;border-radius:17px;color:#7a6659;font-size:11px;font-weight:900;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:2px}.nav span{font-size:23px}.nav.active{background:#f1dfc9;color:#7b3f25}
+.panel{position:fixed;z-index:20;right:10px;left:10px;bottom:89px;max-height:min(62vh,520px);overflow:auto;background:#fffaf5;border-radius:24px;box-shadow:0 18px 60px #2d211a55;border:1px solid #fff;display:none;padding:15px}.panel.show{display:block}
+.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.panel-head h2{margin:0;font-size:21px}.close{width:36px;height:36px;border-radius:12px;background:#eee2d6;font-size:18px}
+.order{display:flex;align-items:center;gap:9px;padding:10px;background:#f5ede4;border-radius:16px;margin:7px 0}.food{width:46px;height:46px;border-radius:14px;background:#fff;display:grid;place-items:center;font-size:27px}.order-main{flex:1;min-width:0}.order-main b{display:block;font-size:14px}.order-main small{color:#8b786b}.cookbtn{background:#d86136;color:#fff;border-radius:12px;padding:9px 12px;font-weight:900}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:9px}.cardx{background:#f5ede4;border-radius:17px;padding:13px;text-align:center}.cardx .big{font-size:32px}.cardx b{display:block;margin:4px}.buy{background:#7b3f25;color:white;border-radius:11px;padding:8px 10px;font-weight:900;width:100%}
+#toast{position:fixed;z-index:40;left:50%;bottom:172px;transform:translateX(-50%);background:#30231c;color:#fff;padding:11px 16px;border-radius:16px;font-weight:800;box-shadow:0 8px 25px #0004;opacity:0;transition:.2s;white-space:nowrap;max-width:90%;overflow:hidden;text-overflow:ellipsis}#toast.show{opacity:1}
+#stick{position:fixed;z-index:10;left:18px;bottom:91px;width:112px;height:112px;border-radius:50%;background:#ffffff36;border:2px solid #fff8;box-shadow:0 5px 20px #0002}.knob{position:absolute;left:30px;top:30px;width:48px;height:48px;border-radius:50%;background:#fff;box-shadow:0 5px 18px #0003}
+#cook{position:fixed;inset:0;z-index:50;background:#1d1510aa;display:none;align-items:flex-end;justify-content:center;padding:14px}.cookcard{width:min(440px,100%);background:#fffaf5;border-radius:27px;padding:20px;box-shadow:0 -5px 40px #0004;text-align:center}.dishbig{font-size:58px}.cookbar{height:13px;background:#eadfd4;border-radius:20px;overflow:hidden;margin:15px 0}.cookbar i{display:block;width:0;height:100%;background:#d86136;border-radius:20px}.serve{width:100%;padding:14px;background:#d86136;color:white;border-radius:15px;font-weight:900}
+#start{position:fixed;inset:0;z-index:100;background:linear-gradient(160deg,#4d3024,#9b5d3c 55%,#e0b17b);display:grid;place-items:center;padding:20px}.startcard{width:min(420px,100%);background:#fffaf5;border-radius:32px;padding:28px 22px;text-align:center;box-shadow:0 25px 80px #1e110b66}.logo{width:92px;height:92px;border-radius:28px;margin:0 auto 10px;background:#f0dcc7;display:grid;place-items:center;font-size:55px}.startcard h1{font-size:34px;margin:8px 0 4px}.startcard p{color:#79675b;line-height:1.55;margin:0 0 18px}.startbtn{width:100%;padding:16px;border-radius:16px;background:#d86136;color:white;font-weight:900;font-size:17px;box-shadow:0 6px 18px #d8613644}
+.hint{margin-top:10px;font-size:12px;color:#9b887a}
+@media(max-width:380px){.stat{min-width:61px;padding:5px 7px;font-size:12px}.restaurant-name{font-size:12px}.bottom{height:66px}.nav span{font-size:21px}}
 </style></head><body>
-<div id="g"></div><div id="start"><div class="card"><div class="logo">👨‍🍳</div><h1>השף הגדול</h1><p>בנה את המסעדה שלך, קבל לקוחות, בשל הזמנות, הרווח כסף והפוך לשף הטוב בעיר.</p><button class="primary" onclick="start()">פתח מסעדה</button></div></div>
-<div id="hud"><div class="pill">💰 <span id="money">120</span></div><div class="pill">⭐ <span id="xp">0</span></div><div class="pill">🏆 רמה <span id="lvl">1</span></div><div class="pill">👥 <span id="guests">0</span></div></div>
-<div id="level"><div class="fill" id="fill"></div></div><div id="menu"><button onclick="toggleOrders()">🍽️ הזמנות</button><button onclick="upgrade()">⬆️ שדרוג</button></div>
-<div id="orders"></div><div id="actions"><button class="act" onclick="interact()"><em>🍳</em><span>בשל</span></button><button class="act" onclick="hire()"><em>🧑‍🍳</em><span>עובד</span></button><button class="act" onclick="decorate()"><em>🪑</em><span>עיצוב</span></button></div>
-<div id="stick"><div class="knob" id="knob"></div></div><div id="toast"></div>
-<div id="cook"><div class="cookcard"><div style="font-size:45px">🍳</div><h2 id="cookTitle">מבשלים...</h2><div class="bar"><i id="cookBar"></i></div><button onclick="finishCook()">הגשה עכשיו</button></div></div>
+<div id="game" class="game"></div>
+<div id="start"><div class="startcard"><div class="logo">👨‍🍳</div><h1>השף הגדול</h1><p>פתח מסעדה משלך, הושב לקוחות, קבל הזמנות, בשל, הגש, הרווח והפוך למסעדה המצליחה בעיר.</p><button class="startbtn" onclick="startGame()">פתח את המסעדה</button><div class="hint">ניהול • בישול • שדרוג • רווחים</div></div></div>
+
+<div class="top">
+<button class="iconbtn" onclick="openPanel('orders')">🍽️</button>
+<div class="restaurant-name">🍴 המסעדה שלי</div>
+<div class="stat gold">💰 <b id="money">120</b></div><div class="stat">⭐ <b id="xp">0</b></div><div class="stat">🏆 <b id="lvl">1</b></div>
+<div class="levelbox"><i id="fill"></i></div>
+</div>
+
+<div class="side"><button onclick="openPanel('shop')">🛒</button><button onclick="openPanel('staff')">👨‍🍳</button><button onclick="openPanel('design')">🪑</button></div>
+
+<div id="panel" class="panel"></div>
+
+<div class="bottom">
+<button class="nav active" onclick="closePanel()"><span>🏠</span>מסעדה</button>
+<button class="nav" onclick="openPanel('orders')"><span>🍽️</span>הזמנות</button>
+<button class="nav" onclick="openPanel('shop')"><span>🛒</span>שדרוגים</button>
+<button class="nav" onclick="openPanel('staff')"><span>👨‍🍳</span>צוות</button>
+</div>
+
+<div id="stick"><div id="knob" class="knob"></div></div><div id="toast"></div>
+<div id="cook"><div class="cookcard"><div id="dishbig" class="dishbig">🍳</div><h2 id="cookTitle">מכינים...</h2><div class="cookbar"><i id="cookBar"></i></div><button class="serve" onclick="finishCook()">הגשה עכשיו</button></div></div>
+
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script>
-let scene,camera,renderer,chef,clock,started=false,money=120,xp=0,level=1,staff=0,decor=0,orders=[],cooking=false,cookOrder=null;
-const keys={x:0,z:0}; const dishes=[['🍔','המבורגר',28],['🍕','פיצה',34],['🍝','פסטה',31],['🥗','סלט',22],['🍰','עוגה',38],['🍗','עוף צלוי',42]];
-function box(w,h,d,c,x,y,z){let m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color:c,roughness:.75}));m.position.set(x,y,z);scene.add(m);return m}
+let scene,camera,renderer,chef,started=false,money=120,xp=0,level=1,staff=0,decor=0,orders=[],cooking=false,cookOrder=null,ct;
+const keys={x:0,z:0};
+const dishes=[['🍔','המבורגר',28],['🍕','פיצה',34],['🍝','פסטה',31],['🥗','סלט',22],['🍰','עוגה',38],['🍗','עוף צלוי',42]];
+function box(w,h,d,c,x,y,z){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color:c,roughness:.72}));m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m}
 function init(){
- scene=new THREE.Scene();scene.background=new THREE.Color(0x9dc6df);scene.fog=new THREE.Fog(0x9dc6df,35,80);
- camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,150);camera.position.set(11,18,19);camera.lookAt(0,0,0);
- renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;document.getElementById('g').appendChild(renderer.domElement);
- scene.add(new THREE.HemisphereLight(0xffffff,0x657060,2.1));let sun=new THREE.DirectionalLight(0xffffff,2);sun.position.set(10,25,10);sun.castShadow=true;scene.add(sun);
- box(50,.4,50,0x6d9b52,0,-.25,0);box(22,.25,10,0xd7b892,0,-.05,5);box(10,.26,30,0xd7b892,-2,-.04,0);
- // restaurant
- box(14,3,8,0xf1eee7,0,1.5,-8);box(15,.35,9,0x9d3e2b,0,3.2,-8);
- box(4,2.8,.35,0x83b6d1,0,1.5,-3.9);box(2.5,2.8,.35,0x83b6d1,-4,1.5,-3.9);box(2.5,2.8,.35,0x83b6d1,4,1.5,-3.9);
- // kitchen
- box(8,1,2,0x777d86,0,1,-7);box(2,1,2,0x555b64,-3,1,-5.8);box(2,1,2,0x555b64,3,1,-5.8);
- // tables
- for(let x=-8;x<=8;x+=4) for(let z=2;z<=8;z+=4){box(2,.25,1.4,0x8a583d,x,.9,z);for(let dx of [-.7,.7])for(let dz of [-.4,.4])box(.18,.8,.18,0x593a29,x+dx,.4,z+dz)}
- // entrance
- box(4,3,.35,0x33383e,0,1.5,9);
- chef=new THREE.Mesh(new THREE.CapsuleGeometry(.45,1,5,10),new THREE.MeshStandardMaterial({color:0xf2c7a5}));chef.position.set(0,1,4);scene.add(chef);
- let hat=new THREE.Mesh(new THREE.CylinderGeometry(.55,.55,.3,16),new THREE.MeshStandardMaterial({color:0xffffff}));hat.position.y=1.75;chef.add(hat);
- for(let i=0;i<8;i++){let g=new THREE.Mesh(new THREE.SphereGeometry(.25,8,8),new THREE.MeshStandardMaterial({color:0x4f6b3d}));g.position.set(-18+i*5,.3,13);scene.add(g)}
- window.addEventListener('resize',resize);animate();spawnOrder();
+ scene=new THREE.Scene();scene.background=new THREE.Color(0xb9d7d1);scene.fog=new THREE.Fog(0xb9d7d1,32,72);
+ camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,150);camera.position.set(13,20,19);camera.lookAt(0,0,1);
+ renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;document.getElementById('game').appendChild(renderer.domElement);
+ scene.add(new THREE.HemisphereLight(0xfff5e6,0x607060,2));const sun=new THREE.DirectionalLight(0xfff1d2,2.4);sun.position.set(12,25,8);sun.castShadow=true;scene.add(sun);
+ box(50,.4,50,0x78a96a,0,-.25,0);
+ // road/path
+ box(8,.18,30,0xcbbda9,0,-.05,2);box(28,.18,5,0xcbbda9,0,-.04,8);
+ // restaurant shell
+ box(17,3.5,10,0xf4e7d2,0,1.75,-7);box(18,.4,11,0x74412e,0,3.7,-7);
+ // windows + entrance
+ box(4,2.5,.25,0x8fc7cf,-5,1.7,-1.9);box(4,2.5,.25,0x8fc7cf,5,1.7,-1.9);box(3.2,2.9,.3,0x5d3a2b,0,1.45,-1.9);
+ // kitchen counters
+ box(8,.9,1.8,0x73564a,0,1,-7.2);box(2,.9,1.8,0xb86b43,-4,1,-5.2);box(2,.9,1.8,0xb86b43,4,1,-5.2);
+ // dining tables/chairs
+ for(let x=-7;x<=7;x+=7)for(let z=2;z<=6;z+=4){box(2.2,.22,1.35,0x9a6548,x,.9,z);for(const dx of [-.75,.75])for(const dz of [-.55,.55])box(.22,.75,.22,0x65402f,x+dx,.4,z+dz)}
+ // plants / signs
+ for(let i=-2;i<=2;i++){const pot=box(.7,.5,.7,0xa45d42,i*4,.25,11);const leaf=box(1.2,1.8,1.2,0x4f8050,i*4,.95,11)}
+ chef=new THREE.Mesh(new THREE.CapsuleGeometry(.42,.95,5,10),new THREE.MeshStandardMaterial({color:0xf0c29f}));chef.position.set(0,1,4);chef.castShadow=true;scene.add(chef);
+ const hat=new THREE.Mesh(new THREE.CylinderGeometry(.55,.55,.28,16),new THREE.MeshStandardMaterial({color:0xffffff}));hat.position.y=1.72;chef.add(hat);
+ window.addEventListener('resize',resize);animate();setTimeout(spawnOrder,1200);
 }
 function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}
-function start(){document.getElementById('start').style.display='none';started=true;init();toast('המסעדה נפתחה! קבל את ההזמנה הראשונה.')}
-function spawnOrder(){if(!started||orders.length>=5)return;let d=dishes[Math.floor(Math.random()*dishes.length)];orders.push({id:Date.now()+Math.random(),dish:d,tip:Math.floor(Math.random()*12),time:Date.now()});renderOrders();document.getElementById('guests').textContent=orders.length;setTimeout(spawnOrder,3000+Math.random()*4000)}
-function renderOrders(){let el=document.getElementById('orders');el.innerHTML=orders.map(o=>'<div class="o"><span class="ico">'+o.dish[0]+'</span><b>'+o.dish[1]+'<small>תשלום: ₪'+(o.dish[2]+o.tip)+'</small></b><button onclick="cook('+o.id+')">בשל</button></div>').join('')}
-function toggleOrders(){let e=document.getElementById('orders');e.style.display=e.style.display==='none'?'block':'none'}document.getElementById('orders').style.display='none';
-function cook(id){if(cooking)return;let o=orders.find(x=>x.id==id);if(!o)return;cooking=true;cookOrder=o;document.getElementById('cook').style.display='flex';document.getElementById('cookTitle').textContent='מכין '+o.dish[1];let t=0;window.ct=setInterval(()=>{t+=4;document.getElementById('cookBar').style.width=t+'%';if(t>=100)finishCook()},120)}
-function finishCook(){if(!cooking)return;clearInterval(window.ct);let o=cookOrder;orders=orders.filter(x=>x.id!==o.id);money+=o.dish[2]+o.tip;xp+=10+o.tip;while(xp>=level*100){xp-=level*100;level++;money+=50;toast('עלית לרמה '+level+'! +₪50')}cooking=false;document.getElementById('cook').style.display='none';document.getElementById('cookBar').style.width='0';renderOrders();sync();toast('הוגש '+o.dish[1]+'! +₪'+(o.dish[2]+o.tip))}
-function sync(){document.getElementById('money').textContent=money;document.getElementById('xp').textContent=xp;document.getElementById('lvl').textContent=level;document.getElementById('fill').style.width=Math.min(100,xp/(level*100)*100)+'%';document.getElementById('guests').textContent=orders.length}
-function upgrade(){let cost=150+level*80;if(money<cost)return toast('צריך ₪'+cost+' לשדרוג');money-=cost;xp+=30;toast('המסעדה שודרגה! הלקוחות מרוצים יותר.');sync()}
-function hire(){let cost=100+staff*80;if(money<cost)return toast('צריך ₪'+cost);money-=cost;staff++;toast('העסקת עובד חדש 👨‍🍳');sync()}
-function decorate(){let cost=60+decor*30;if(money<cost)return toast('צריך ₪'+cost);money-=cost;decor++;box(1.2,.9,1.2,0xc98b5b,-7+decor%5,1,1+Math.floor(decor/5)*3);toast('נוסף פריט עיצוב!');sync()}
-function interact(){if(orders.length) cook(orders[0].id);else toast('אין כרגע הזמנה. המתן ללקוחות.')}
-function toast(s){let e=document.getElementById('toast');e.textContent=s;e.classList.add('show');clearTimeout(window.tt);window.tt=setTimeout(()=>e.classList.remove('show'),1800)}
-function move(){if(!chef)return;let sp=.12*(staff?1.08:1);chef.position.x+=keys.x*sp;chef.position.z+=keys.z*sp;chef.position.x=Math.max(-15,Math.min(15,chef.position.x));chef.position.z=Math.max(-10,Math.min(14,chef.position.z));camera.position.x+=(chef.position.x+11-camera.position.x)*.04;camera.position.z+=(chef.position.z+15-camera.position.z)*.04;camera.lookAt(chef.position.x,0,chef.position.z)}
-const stick=document.getElementById('stick'),knob=document.getElementById('knob');let sid=null;function pointer(e){let r=stick.getBoundingClientRect(),x=e.clientX-r.left-r.width/2,z=e.clientY-r.top-r.height/2,l=Math.hypot(x,z),m=45;if(l>m){x=x/l*m;z=z/l*m}knob.style.transform='translate('+x+'px,'+z+'px)';keys.x=x/m;keys.z=z/m}
+function startGame(){document.getElementById('start').style.display='none';started=true;init();toast('המסעדה נפתחה! הלקוח הראשון נכנס.');renderPanel('orders')}
+function spawnOrder(){if(!started)return;if(orders.length<5){const d=dishes[Math.floor(Math.random()*dishes.length)];orders.push({id:Date.now()+Math.random(),dish:d,tip:Math.floor(Math.random()*12)});sync()}renderPanel('orders');setTimeout(spawnOrder,4500+Math.random()*3500)}
+function openPanel(type){renderPanel(type);document.getElementById('panel').classList.add('show')}
+function closePanel(){document.getElementById('panel').classList.remove('show')}
+function renderPanel(type){
+ const p=document.getElementById('panel');
+ if(type==='orders'){p.innerHTML='<div class="panel-head"><h2>🍽️ הזמנות פעילות</h2><button class="close" onclick="closePanel()">✕</button></div>'+ (orders.length?orders.map(o=>'<div class="order"><div class="food">'+o.dish[0]+'</div><div class="order-main"><b>'+o.dish[1]+'</b><small>💰 ₪'+(o.dish[2]+o.tip)+' • לקוח ממתין</small></div><button class="cookbtn" onclick="cook('+o.id+')">לבשל</button></div>').join(''):'<p style="text-align:center;color:#8b786b;padding:25px">אין הזמנות כרגע. הלקוחות בדרך.</p>')}
+ if(type==='shop'){p.innerHTML='<div class="panel-head"><h2>🛒 שדרוג המסעדה</h2><button class="close" onclick="closePanel()">✕</button></div><div class="cards"><div class="cardx"><div class="big">🔥</div><b>מטבח מהיר</b><small>מזרז בישול</small><button class="buy" onclick="buyUpgrade()">₪'+(150+level*80)+'</button></div><div class="cardx"><div class="big">🪑</div><b>שולחנות חדשים</b><small>יותר לקוחות</small><button class="buy" onclick="buyDecor()">₪'+(60+decor*30)+'</button></div></div>'}
+ if(type==='staff'){p.innerHTML='<div class="panel-head"><h2>👨‍🍳 צוות</h2><button class="close" onclick="closePanel()">✕</button></div><div class="cards"><div class="cardx"><div class="big">👨‍🍳</div><b>טבח</b><small>מייעל את המטבח</small><button class="buy" onclick="hire()">העסק ₪'+(100+staff*80)+'</button></div><div class="cardx"><div class="big">🧹</div><b>מנקה</b><small>שומר על המסעדה</small><button class="buy" onclick="toast('מנקה ייפתח ברמה 3')">רמה 3</button></div></div>'}
+}
+function cook(id){if(cooking)return;const o=orders.find(x=>x.id==id);if(!o)return;cooking=true;cookOrder=o;document.getElementById('cook').style.display='flex';document.getElementById('dishbig').textContent=o.dish[0];document.getElementById('cookTitle').textContent='מכינים '+o.dish[1];let t=0;ct=setInterval(()=>{t+=5;document.getElementById('cookBar').style.width=t+'%';if(t>=100)finishCook()},120)}
+function finishCook(){if(!cooking)return;clearInterval(ct);const o=cookOrder;orders=orders.filter(x=>x.id!==o.id);money+=o.dish[2]+o.tip;xp+=10+o.tip;while(xp>=level*100){xp-=level*100;level++;money+=50;toast('עלית לרמה '+level+'! בונוס ₪50')}cooking=false;document.getElementById('cook').style.display='none';document.getElementById('cookBar').style.width='0';sync();renderPanel('orders');toast('הוגש '+o.dish[1]+'! +₪'+(o.dish[2]+o.tip))}
+function buyUpgrade(){const c=150+level*80;if(money<c)return toast('חסרים ₪'+(c-money));money-=c;xp+=30;toast('המטבח שודרג!');sync();renderPanel('shop')}
+function hire(){const c=100+staff*80;if(money<c)return toast('חסרים ₪'+(c-money));money-=c;staff++;toast('הטבח החדש הצטרף לצוות!');sync();renderPanel('staff')}
+function buyDecor(){const c=60+decor*30;if(money<c)return toast('חסרים ₪'+(c-money));money-=c;decor++;box(1,.8,1,0x9d684a,-8+(decor%6)*3,.6,10-Math.floor(decor/6)*3);toast('נוסף עיצוב חדש למסעדה');sync();renderPanel('shop')}
+function sync(){document.getElementById('money').textContent=money;document.getElementById('xp').textContent=xp;document.getElementById('lvl').textContent=level;document.getElementById('fill').style.width=Math.min(100,xp/(level*100)*100)+'%';}
+function toast(s){const e=document.getElementById('toast');e.textContent=s;e.classList.add('show');clearTimeout(window.tt);window.tt=setTimeout(()=>e.classList.remove('show'),1900)}
+function move(){if(!chef)return;const sp=.11*(staff?1.08:1);chef.position.x+=keys.x*sp;chef.position.z+=keys.z*sp;chef.position.x=Math.max(-14,Math.min(14,chef.position.x));chef.position.z=Math.max(-10,Math.min(13,chef.position.z));camera.position.x+=(chef.position.x+12-camera.position.x)*.035;camera.position.z+=(chef.position.z+15-camera.position.z)*.035;camera.lookAt(chef.position.x,0,chef.position.z)}
+const stick=document.getElementById('stick'),knob=document.getElementById('knob');let sid=null;
+function pointer(e){const r=stick.getBoundingClientRect();let x=e.clientX-r.left-r.width/2,z=e.clientY-r.top-r.height/2,l=Math.hypot(x,z),m=43;if(l>m){x=x/l*m;z=z/l*m}knob.style.transform='translate('+x+'px,'+z+'px)';keys.x=x/m;keys.z=z/m}
 stick.addEventListener('pointerdown',e=>{sid=e.pointerId;stick.setPointerCapture(sid);pointer(e)});stick.addEventListener('pointermove',e=>{if(e.pointerId===sid)pointer(e)});stick.addEventListener('pointerup',()=>{sid=null;knob.style.transform='';keys.x=keys.z=0});
-function animate(){requestAnimationFrame(animate);move();if(renderer)renderer.render(scene,camera)}sync();
+function animate(){requestAnimationFrame(animate);move();if(renderer)renderer.render(scene,camera)}
+sync();
 </script></body></html>
