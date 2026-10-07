@@ -6,11 +6,11 @@
 <title>השף הגדול</title>
 <style>
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#e8dfd2;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;touch-action:none;color:#2b211b}
-button{font:inherit;border:0;cursor:pointer}.game{position:fixed;inset:0}.game canvas{display:block}
+button{font:inherit;border:0;cursor:pointer}.game{position:fixed;inset:0;z-index:0;display:block;background:#b9d7d1}.game canvas{display:block!important;position:absolute!important;inset:0!important;width:100%!important;height:100%!important;z-index:0!important}
 .top{position:fixed;top:max(10px,env(safe-area-inset-top));left:10px;right:10px;height:58px;z-index:8;display:flex;align-items:center;gap:7px;pointer-events:none}
 .stat{min-width:72px;height:46px;padding:5px 10px;border-radius:15px;background:#fffaf4eF;border:1px solid #ffffff;box-shadow:0 4px 14px #49372a22;display:flex;align-items:center;gap:5px;font-weight:900;font-size:14px}.stat b{font-size:15px}.stat.gold{background:#fff3c9}
 .levelbox{position:absolute;right:0;top:52px;width:135px;height:7px;border-radius:10px;background:#0002;overflow:hidden}.levelbox i{display:block;height:100%;width:0;background:#e7a62b;border-radius:10px}
-.restaurant-name{position:absolute;left:50%;transform:translateX(-50%);background:#51362a;color:#fff7eb;padding:8px 15px;border-radius:18px;font-weight:900;box-shadow:0 4px 14px #0002;white-space:nowrap}
+.restaurant-name{display:none!important}
 .iconbtn{width:46px;height:46px;border-radius:15px;background:#fffaf4;color:#51362a;box-shadow:0 4px 14px #49372a22;font-size:21px;pointer-events:auto}.top .iconbtn:first-child{margin-right:auto}
 .side{position:fixed;right:10px;top:78px;z-index:7;display:flex;flex-direction:column;gap:8px}.side button{width:48px;height:48px;border-radius:15px;background:#fffaf4;box-shadow:0 4px 14px #49372a22;font-size:21px}
 .bottom{position:fixed;left:9px;right:9px;bottom:max(9px,env(safe-area-inset-bottom));z-index:9;height:70px;background:#fffaf4F2;border:1px solid #fff;border-radius:22px;box-shadow:0 8px 28px #3a281d35;display:grid;grid-template-columns:repeat(4,1fr);padding:5px;gap:5px}
@@ -29,25 +29,25 @@ button{font:inherit;border:0;cursor:pointer}.game{position:fixed;inset:0}.game c
 <div id="game" class="game"></div>
 
 <div class="top">
-<button class="iconbtn" onclick="openPanel('orders')">🍽️</button>
-<div class="restaurant-name">🍴 המסעדה שלי</div>
+<button class="iconbtn" data-action="orders">🍽️</button>
+
 <div class="stat gold">💰 <b id="money">120</b></div><div class="stat">⭐ <b id="xp">0</b></div><div class="stat">🏆 <b id="lvl">1</b></div>
 <div class="levelbox"><i id="fill"></i></div>
 </div>
 
-<div class="side"><button onclick="openPanel('shop')">🛒</button><button onclick="openPanel('staff')">👨‍🍳</button><button onclick="openPanel('design')">🪑</button></div>
+<div class="side"><button data-action="shop">🛒</button><button data-action="staff">👨‍🍳</button><button data-action="design">🪑</button></div>
 
 <div id="panel" class="panel"></div>
 
 <div class="bottom">
-<button class="nav active" onclick="closePanel()"><span>🏠</span>מסעדה</button>
-<button class="nav" onclick="openPanel('orders')"><span>🍽️</span>הזמנות</button>
-<button class="nav" onclick="openPanel('shop')"><span>🛒</span>שדרוגים</button>
-<button class="nav" onclick="openPanel('staff')"><span>👨‍🍳</span>צוות</button>
+<button class="nav active" data-action="home"><span>🏠</span>מסעדה</button>
+<button class="nav" data-action="orders"><span>🍽️</span>הזמנות</button>
+<button class="nav" data-action="shop"><span>🛒</span>שדרוגים</button>
+<button class="nav" data-action="staff"><span>👨‍🍳</span>צוות</button>
 </div>
 
 <div id="stick"><div id="knob" class="knob"></div></div><div id="toast"></div>
-<div id="cook"><div class="cookcard"><div id="dishbig" class="dishbig">🍳</div><h2 id="cookTitle">מכינים...</h2><div class="cookbar"><i id="cookBar"></i></div><button class="serve" onclick="finishCook()">הגשה עכשיו</button></div></div>
+<div id="cook"><div class="cookcard"><div id="dishbig" class="dishbig">🍳</div><h2 id="cookTitle">מכינים...</h2><div class="cookbar"><i id="cookBar"></i></div><button class="serve" data-action="finish">הגשה עכשיו</button></div></div>
 
 <script>
 (function(){
@@ -82,7 +82,7 @@ function box(w,h,d,c,x,y,z){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),
 function init(){
  scene=new THREE.Scene();scene.background=new THREE.Color(0xb9d7d1);scene.fog=new THREE.Fog(0xb9d7d1,32,72);
  camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,150);camera.position.set(13,20,19);camera.lookAt(0,0,1);
- renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;document.getElementById('game').appendChild(renderer.domElement);
+ renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setClearColor(0xb9d7d1,1);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.domElement.style.pointerEvents='none';renderer.shadowMap.enabled=true;document.getElementById('game').appendChild(renderer.domElement);
  scene.add(new THREE.HemisphereLight(0xfff5e6,0x607060,2));const sun=new THREE.DirectionalLight(0xfff1d2,2.4);sun.position.set(12,25,8);sun.castShadow=true;scene.add(sun);
  box(50,.4,50,0x78a96a,0,-.25,0);
  // road/path
@@ -105,13 +105,13 @@ function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMa
 function startGame(event){try{started=true;init();toast('המסעדה נפתחה! הלקוח הראשון נכנס.');renderPanel('orders')}catch(e){console.error(e);toast('תקלה בהפעלת המשחק')}}
 window.addEventListener('load',function(){setTimeout(function(){startGame();},50)});
 function spawnOrder(){if(!started)return;if(orders.length<5){const d=dishes[Math.floor(Math.random()*dishes.length)];orders.push({id:Date.now()+Math.random(),dish:d,tip:Math.floor(Math.random()*12)});sync()}renderPanel('orders');setTimeout(spawnOrder,4500+Math.random()*3500)}
-function openPanel(type){renderPanel(type);document.getElementById('panel').classList.add('show')}
+document.addEventListener('click',function(e){const el=e.target.closest('[data-action],[data-cook]');if(!el)return;e.preventDefault();e.stopPropagation();const id=el.getAttribute('data-cook');if(id!==null){cook(id);return}const a=el.getAttribute('data-action');if(a==='home'||a==='close')closePanel();else if(a==='orders'||a==='shop'||a==='staff'||a==='design')openPanel(a==='design'?'design':a);else if(a==='upgrade')buyUpgrade();else if(a==='decor')buyDecor();else if(a==='hire')hire();else if(a==='cleaner')toast('מנקה ייפתח ברמה 3');else if(a==='finish')finishCook();},true);function openPanel(type){renderPanel(type);document.getElementById('panel').classList.add('show')}
 function closePanel(){document.getElementById('panel').classList.remove('show')}
 function renderPanel(type){
  const p=document.getElementById('panel');
- if(type==='orders'){p.innerHTML='<div class="panel-head"><h2>🍽️ הזמנות פעילות</h2><button class="close" onclick="closePanel()">✕</button></div>'+ (orders.length?orders.map(o=>'<div class="order"><div class="food">'+o.dish[0]+'</div><div class="order-main"><b>'+o.dish[1]+'</b><small>💰 ₪'+(o.dish[2]+o.tip)+' • לקוח ממתין</small></div><button class="cookbtn" onclick="cook('+o.id+')">לבשל</button></div>').join(''):'<p style="text-align:center;color:#8b786b;padding:25px">אין הזמנות כרגע. הלקוחות בדרך.</p>')}
- if(type==='shop'){p.innerHTML='<div class="panel-head"><h2>🛒 שדרוג המסעדה</h2><button class="close" onclick="closePanel()">✕</button></div><div class="cards"><div class="cardx"><div class="big">🔥</div><b>מטבח מהיר</b><small>מזרז בישול</small><button class="buy" onclick="buyUpgrade()">₪'+(150+level*80)+'</button></div><div class="cardx"><div class="big">🪑</div><b>שולחנות חדשים</b><small>יותר לקוחות</small><button class="buy" onclick="buyDecor()">₪'+(60+decor*30)+'</button></div></div>'}
- if(type==='staff'){p.innerHTML='<div class="panel-head"><h2>👨‍🍳 צוות</h2><button class="close" onclick="closePanel()">✕</button></div><div class="cards"><div class="cardx"><div class="big">👨‍🍳</div><b>טבח</b><small>מייעל את המטבח</small><button class="buy" onclick="hire()">העסק ₪'+(100+staff*80)+'</button></div><div class="cardx"><div class="big">🧹</div><b>מנקה</b><small>שומר על המסעדה</small><button class="buy" onclick="toast('מנקה ייפתח ברמה 3')">רמה 3</button></div></div>'}
+ if(type==='orders'){p.innerHTML='<div class="panel-head"><h2>🍽️ הזמנות פעילות</h2><button class="close" data-action="close">✕</button></div>'+ (orders.length?orders.map(o=>'<div class="order"><div class="food">'+o.dish[0]+'</div><div class="order-main"><b>'+o.dish[1]+'</b><small>💰 ₪'+(o.dish[2]+o.tip)+' • לקוח ממתין</small></div><button class="cookbtn" onclick="cook('+o.id+')">לבשל</button></div>').join(''):'<p style="text-align:center;color:#8b786b;padding:25px">אין הזמנות כרגע. הלקוחות בדרך.</p>')}
+ if(type==='shop'){p.innerHTML='<div class="panel-head"><h2>🛒 שדרוג המסעדה</h2><button class="close" data-action="close">✕</button></div><div class="cards"><div class="cardx"><div class="big">🔥</div><b>מטבח מהיר</b><small>מזרז בישול</small><button class="buy" data-action="upgrade">₪'+(150+level*80)+'</button></div><div class="cardx"><div class="big">🪑</div><b>שולחנות חדשים</b><small>יותר לקוחות</small><button class="buy" data-action="decor">₪'+(60+decor*30)+'</button></div></div>'}
+ if(type==='staff'){p.innerHTML='<div class="panel-head"><h2>👨‍🍳 צוות</h2><button class="close" data-action="close">✕</button></div><div class="cards"><div class="cardx"><div class="big">👨‍🍳</div><b>טבח</b><small>מייעל את המטבח</small><button class="buy" data-action="hire">העסק ₪'+(100+staff*80)+'</button></div><div class="cardx"><div class="big">🧹</div><b>מנקה</b><small>שומר על המסעדה</small><button class="buy" data-action="cleaner">רמה 3</button></div></div>'}
 }
 function cook(id){if(cooking)return;const o=orders.find(x=>x.id==id);if(!o)return;cooking=true;cookOrder=o;document.getElementById('cook').style.display='flex';document.getElementById('dishbig').textContent=o.dish[0];document.getElementById('cookTitle').textContent='מכינים '+o.dish[1];let t=0;ct=setInterval(()=>{t+=5;document.getElementById('cookBar').style.width=t+'%';if(t>=100)finishCook()},120)}
 function finishCook(){if(!cooking)return;clearInterval(ct);const o=cookOrder;orders=orders.filter(x=>x.id!==o.id);money+=o.dish[2]+o.tip;xp+=10+o.tip;while(xp>=level*100){xp-=level*100;level++;money+=50;toast('עלית לרמה '+level+'! בונוס ₪50')}cooking=false;document.getElementById('cook').style.display='none';document.getElementById('cookBar').style.width='0';sync();renderPanel('orders');toast('הוגש '+o.dish[1]+'! +₪'+(o.dish[2]+o.tip))}
