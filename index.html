@@ -47,7 +47,7 @@ button{font:inherit;border:0;cursor:pointer}.game{position:fixed;inset:0;z-index
 </div>
 
 <div id="stick"><div id="knob" class="knob"></div></div><div id="toast"></div>
-<div id="cook"><div class="cookcard"><div id="dishbig" class="dishbig">🍳</div><h2 id="cookTitle">מכינים...</h2><div class="cookbar"><i id="cookBar"></i></div><button class="serve" data-action="finish">הגשה עכשיו</button></div></div>
+<div id="cook"><div class="cookcard"><div id="dishbig" class="dishbig">🍳</div><h2 id="cookTitle">מכינים...</h2><div class="cookbar"><i id="cookBar"></i></div><button class="serve" data-action="finish">הגש ללקוח</button></div></div>
 
 <script>
 (function(){
@@ -75,33 +75,42 @@ button{font:inherit;border:0;cursor:pointer}.game{position:fixed;inset:0;z-index
 </script>
 <script src="./three.min.js"></script>
 <script>
-let scene,camera,renderer,chef,started=false,money=120,xp=0,level=1,staff=0,decor=0,orders=[],cooking=false,cookOrder=null,ct;
+let scene,camera,renderer,chef,customers=[],started=false,money=120,xp=0,level=1,staff=0,decor=0,orders=[],cooking=false,cookOrder=null,ct;
 const keys={x:0,z:0};
 const dishes=[['🍔','המבורגר',28],['🍕','פיצה',34],['🍝','פסטה',31],['🥗','סלט',22],['🍰','עוגה',38],['🍗','עוף צלוי',42]];
 function box(w,h,d,c,x,y,z){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color:c,roughness:.72}));m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m}
 function init(){
  scene=new THREE.Scene();scene.background=new THREE.Color(0xb9d7d1);scene.fog=new THREE.Fog(0xb9d7d1,32,72);
- camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,150);camera.position.set(13,20,19);camera.lookAt(0,0,1);
+ camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,150);camera.position.set(12,22,22);camera.lookAt(0,0,1);
  renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setClearColor(0xb9d7d1,1);renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.domElement.style.pointerEvents='none';renderer.shadowMap.enabled=true;document.getElementById('game').appendChild(renderer.domElement);
  scene.add(new THREE.HemisphereLight(0xfff5e6,0x607060,2));const sun=new THREE.DirectionalLight(0xfff1d2,2.4);sun.position.set(12,25,8);sun.castShadow=true;scene.add(sun);
  box(50,.4,50,0x78a96a,0,-.25,0);
- // road/path
- box(8,.18,30,0xcbbda9,0,-.05,2);box(28,.18,5,0xcbbda9,0,-.04,8);
- // restaurant shell
- box(17,3.5,10,0xf4e7d2,0,1.75,-7);box(18,.4,11,0x74412e,0,3.7,-7);
- // windows + entrance
- box(4,2.5,.25,0x8fc7cf,-5,1.7,-1.9);box(4,2.5,.25,0x8fc7cf,5,1.7,-1.9);box(3.2,2.9,.3,0x5d3a2b,0,1.45,-1.9);
- // kitchen counters
- box(8,.9,1.8,0x73564a,0,1,-7.2);box(2,.9,1.8,0xb86b43,-4,1,-5.2);box(2,.9,1.8,0xb86b43,4,1,-5.2);
- // dining tables/chairs
- for(let x=-7;x<=7;x+=7)for(let z=2;z<=6;z+=4){box(2.2,.22,1.35,0x9a6548,x,.9,z);for(const dx of [-.75,.75])for(const dz of [-.55,.55])box(.22,.75,.22,0x65402f,x+dx,.4,z+dz)}
- // plants / signs
- for(let i=-2;i<=2;i++){const pot=box(.7,.5,.7,0xa45d42,i*4,.25,11);const leaf=box(1.2,1.8,1.2,0x4f8050,i*4,.95,11)}
- chef=new THREE.Group();chef.position.set(0,0,4);scene.add(chef);makePerson(chef,0xf0c29f,0x315c9a,0xffffff);
- for(let i=0;i<6;i++){const p=new THREE.Group();p.position.set(-6+i*2.4,0,1+(i%2)*3);makePerson(p,[0xf0c29f,0x8d5a3b,0xd89b72,0xf0c29f,0x9b6b45,0xd6a27a][i],[0x315c9a,0x8f3f35,0x4d6a3a,0x6b4b9b,0x315c9a,0x9a6a2f][i],0xf5f5f5);p.userData.speed=.008+i*.001;p.userData.phase=i;scene.add(p)}
+ box(8,.18,30,0xcbbda9,0,-.05,2);box(30,.18,5,0xcbbda9,0,-.04,10);box(12,.12,6,0xd8c9b5,0,-.02,13);
+ box(18,3.4,8,0xf2e1ca,0,1.7,-7);box(18.5,.45,9,0x6d3d2b,0,3.65,-7);box(18,.35,.25,0x5a3327,0,2.1,-2.9);
+ box(.45,3.2,.45,0x6a4636,-8.5,1.6,-2.7);box(.45,3.2,.45,0x6a4636,8.5,1.6,-2.7);
+ box(5,2.8,.18,0x8fcbd2,-5.7,1.55,-2.88);box(5,2.8,.18,0x8fcbd2,5.7,1.55,-2.88);box(2.8,2.9,.2,0x9ed6da,0,1.5,-2.9);
+ // kitchen
+ box(15,.85,1.6,0x765447,0,.85,-8);for(let i=-4.8;i<=4.8;i+=2.4)box(1.65,1.55,1.15,0x3b302c,i,1.15,-7);for(let i=-4.8;i<=4.8;i+=2.4)box(1.25,.12,.95,0xf08b43,i,1.95,-7);
+ box(2.1,.9,1.4,0x9b735f,-6.6,.9,-5.8);box(2.1,.9,1.4,0x9b735f,6.6,.9,-5.8);box(2.2,.85,1.2,0x6f8b8b,-3.6,.9,-5.8);
+ box(8,.95,.75,0x9c6848,0,.95,-4.7);box(8,.12,.82,0xe8c16a,0,1.48,-4.7);
+ // dining
+ for(let x=-6;x<=6;x+=6)for(let z=-.5;z<=5.5;z+=3){box(2.4,.22,1.4,0x9a6548,x,.9,z);for(const dx of [-.9,.9])for(const dz of [-.62,.62])box(.28,.72,.28,0x65402f,x+dx,.4,z+dz)}
+ box(3.2,.04,1.5,0x9c6a42,0,.02,-1.2);
+ // restroom
+ box(3.2,2.5,3.2,0xe9d8c2,7,1.25,3.8);box(3,1.8,.18,0x8fc7cf,7,1.45,2.15);box(1,1.1,.2,0x5a3a2f,7,1.2,2);
+ box(.85,.45,.85,0xffffff,6.25,.35,3.3);box(.85,.45,.85,0xffffff,7.75,.35,3.3);box(1,.8,.8,0x8b8b8b,7,.4,4.35);
+ // trash
+ box(1.25,1.5,1.25,0x38443e,-8,.75,5.6);box(1.05,.12,1.05,0x1f2825,-8,1.52,5.6);box(.45,.45,.08,0xf0d36a,-8,1.58,5.6);
+ for(let i=-2;i<=2;i++){box(.7,.5,.7,0xa45d42,i*4,.25,11);box(1.2,1.8,1.2,0x4f8050,i*4,.95,11)}
+ box(2.4,1,.12,0x5a3a2f,0,2.65,-2.75);box(2,.8,.12,0xe8c16a,0,2,-4.55);
+ chef=new THREE.Group();chef.position.set(0,0,7);scene.add(chef);makeChef(chef);
+ customers=[];
+ const seats=[[-6,-.5,1],[0,-.5,1],[6,-.5,1],[-6,5.5,-1],[0,5.5,-1],[6,5.5,-1]];
+ seats.forEach((s,i)=>{const p=new THREE.Group();p.position.set(s[0],0,s[1]);p.rotation.y=s[2]>0?Math.PI:0;p.userData.state='seated';p.userData.id=i;makePerson(p,[0xf0c29f,0x8d5a3b,0xd89b72,0xf0c29f,0x9b6b45,0xd6a27a][i],[0x315c9a,0x8f3f35,0x4d6a3a,0x6b4b9b,0x315c9a,0x9a6a2f][i],0x3e4148,true);scene.add(p);customers.push(p)})
  window.addEventListener('resize',resize);animate();setTimeout(spawnOrder,1200);
 }
-function makePerson(g,skin,shirt,pants){const body=new THREE.Mesh(new THREE.CapsuleGeometry(.42,.8,4,8),new THREE.MeshStandardMaterial({color:shirt}));body.position.y=1.05;body.castShadow=true;g.add(body);const head=new THREE.Mesh(new THREE.SphereGeometry(.34,16,12),new THREE.MeshStandardMaterial({color:skin}));head.position.y=1.95;head.castShadow=true;g.add(head);const leg1=new THREE.Mesh(new THREE.BoxGeometry(.18,.65,.18),new THREE.MeshStandardMaterial({color:pants}));leg1.position.set(-.18,.35,0);g.add(leg1);const leg2=leg1.clone();leg2.position.x=.18;g.add(leg2);const arm1=new THREE.Mesh(new THREE.BoxGeometry(.16,.6,.16),new THREE.MeshStandardMaterial({color:skin}));arm1.position.set(-.52,1.05,0);g.add(arm1);const arm2=arm1.clone();arm2.position.x=.52;g.add(arm2)}
+function makePerson(g,skin,shirt,pants,seated=false){const body=new THREE.Mesh(new THREE.CapsuleGeometry(.42,.8,4,8),new THREE.MeshStandardMaterial({color:shirt,roughness:.8}));body.position.y=seated?.88:1.05;body.castShadow=true;g.add(body);const head=new THREE.Mesh(new THREE.SphereGeometry(.34,16,12),new THREE.MeshStandardMaterial({color:skin,roughness:.85}));head.position.y=seated?1.7:1.95;head.castShadow=true;g.add(head);const leg1=new THREE.Mesh(new THREE.BoxGeometry(.18,.65,.18),new THREE.MeshStandardMaterial({color:pants}));leg1.position.set(-.18,seated?.25:.35,0);g.add(leg1);const leg2=leg1.clone();leg2.position.x=.18;g.add(leg2);const arm1=new THREE.Mesh(new THREE.BoxGeometry(.16,.6,.16),new THREE.MeshStandardMaterial({color:skin}));arm1.position.set(-.52,seated?.92:1.05,0);g.add(arm1);const arm2=arm1.clone();arm2.position.x=.52;g.add(arm2)}
+function makeChef(g){makePerson(g,0xf0c29f,0x315c9a,0xffffff);const hat=new THREE.Mesh(new THREE.CylinderGeometry(.48,.38,.28,20),new THREE.MeshStandardMaterial({color:0xffffff}));hat.position.y=2.38;hat.castShadow=true;g.add(hat)}
 function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}
 function startGame(event){try{started=true;init();toast('המסעדה נפתחה! הלקוח הראשון נכנס.');renderPanel('orders')}catch(e){console.error(e);toast('תקלה בהפעלת המשחק')}}
 window.addEventListener('load',function(){setTimeout(function(){startGame();},50)});
@@ -110,18 +119,18 @@ document.addEventListener('click',function(e){const el=e.target.closest('[data-a
 function closePanel(){document.getElementById('panel').classList.remove('show')}
 function renderPanel(type){
  const p=document.getElementById('panel');
- if(type==='orders'){p.innerHTML='<div class="panel-head"><h2>🍽️ הזמנות פעילות</h2><button class="close" data-action="close">✕</button></div>'+ (orders.length?orders.map(o=>'<div class="order"><div class="food">'+o.dish[0]+'</div><div class="order-main"><b>'+o.dish[1]+'</b><small>💰 ₪'+(o.dish[2]+o.tip)+' • לקוח ממתין</small></div><button class="cookbtn" onclick="cook('+o.id+')">לבשל</button></div>').join(''):'<p style="text-align:center;color:#8b786b;padding:25px">אין הזמנות כרגע. הלקוחות בדרך.</p>')}
+ if(type==='orders'){p.innerHTML='<div class="panel-head"><h2>🍽️ הזמנות פעילות</h2><button class="close" data-action="close">✕</button></div>'+ (orders.length?orders.map(o=>'<div class="order"><div class="food">'+o.dish[0]+'</div><div class="order-main"><b>'+o.dish[1]+'</b><small>💰 ₪'+(o.dish[2]+o.tip)+' • לקוח ממתין</small></div><button class="cookbtn" data-cook="'+o.id+'">לבשל</button></div>').join(''):'<p style="text-align:center;color:#8b786b;padding:25px">אין הזמנות כרגע. הלקוחות בדרך.</p>')}
  if(type==='shop'){p.innerHTML='<div class="panel-head"><h2>🛒 שדרוג המסעדה</h2><button class="close" data-action="close">✕</button></div><div class="cards"><div class="cardx"><div class="big">🔥</div><b>מטבח מהיר</b><small>מזרז בישול</small><button class="buy" data-action="upgrade">₪'+(150+level*80)+'</button></div><div class="cardx"><div class="big">🪑</div><b>שולחנות חדשים</b><small>יותר לקוחות</small><button class="buy" data-action="decor">₪'+(60+decor*30)+'</button></div></div>'}
  if(type==='staff'){p.innerHTML='<div class="panel-head"><h2>👨‍🍳 צוות</h2><button class="close" data-action="close">✕</button></div><div class="cards"><div class="cardx"><div class="big">👨‍🍳</div><b>טבח</b><small>מייעל את המטבח</small><button class="buy" data-action="hire">העסק ₪'+(100+staff*80)+'</button></div><div class="cardx"><div class="big">🧹</div><b>מנקה</b><small>שומר על המסעדה</small><button class="buy" data-action="cleaner">רמה 3</button></div></div>'}
 }
-function cook(id){if(cooking)return;const o=orders.find(x=>x.id==id);if(!o)return;cooking=true;cookOrder=o;document.getElementById('cook').style.display='flex';document.getElementById('dishbig').textContent=o.dish[0];document.getElementById('cookTitle').textContent='מכינים '+o.dish[1];let t=0;ct=setInterval(()=>{t+=5;document.getElementById('cookBar').style.width=t+'%';if(t>=100)finishCook()},120)}
-function finishCook(){if(!cooking)return;clearInterval(ct);const o=cookOrder;orders=orders.filter(x=>x.id!==o.id);money+=o.dish[2]+o.tip;xp+=10+o.tip;while(xp>=level*100){xp-=level*100;level++;money+=50;toast('עלית לרמה '+level+'! בונוס ₪50')}cooking=false;document.getElementById('cook').style.display='none';document.getElementById('cookBar').style.width='0';sync();renderPanel('orders');toast('הוגש '+o.dish[1]+'! +₪'+(o.dish[2]+o.tip))}
+function cook(id){if(cooking)return;const o=orders.find(x=>x.id==id);if(!o)return;cooking=true;cookOrder=o;o.ready=false;document.getElementById('cook').style.display='flex';document.getElementById('dishbig').textContent=o.dish[0];document.getElementById('cookTitle').textContent='מכינים '+o.dish[1]+' במטבח';let t=0;ct=setInterval(()=>{t+=4;document.getElementById('cookBar').style.width=t+'%';if(t>=100){clearInterval(ct);o.ready=true;cooking=false;document.getElementById('cookTitle').textContent='המנה מוכנה — גש ללקוח';document.querySelector('.serve').textContent='הגש ללקוח';toast('הצלחת מוכנה. גש לשולחן והגש אותה')}},140)}
+function finishCook(){const o=cookOrder;if(!o||!o.ready)return toast('סיים קודם את הבישול');const target=customers.find(c=>c.userData.id===Math.floor(o.id)%customers.length)||customers[0];if(Math.hypot(chef.position.x-target.position.x,chef.position.z-target.position.z)>3){toast('התקרב ללקוח היושב ליד השולחן כדי להגיש');return}orders=orders.filter(x=>x.id!==o.id);money+=o.dish[2]+o.tip;xp+=10+o.tip;while(xp>=level*100){xp-=level*100;level++;money+=50;toast('עלית לרמה '+level+'! בונוס ₪50')}target.userData.state='eating';cooking=false;document.getElementById('cook').style.display='none';document.getElementById('cookBar').style.width='0';cookOrder=null;sync();renderPanel('orders');toast('הגשת '+o.dish[1]+' ללקוח! +₪'+(o.dish[2]+o.tip))}
 function buyUpgrade(){const c=150+level*80;if(money<c)return toast('חסרים ₪'+(c-money));money-=c;xp+=30;toast('המטבח שודרג!');sync();renderPanel('shop')}
 function hire(){const c=100+staff*80;if(money<c)return toast('חסרים ₪'+(c-money));money-=c;staff++;toast('הטבח החדש הצטרף לצוות!');sync();renderPanel('staff')}
 function buyDecor(){const c=60+decor*30;if(money<c)return toast('חסרים ₪'+(c-money));money-=c;decor++;box(1,.8,1,0x9d684a,-8+(decor%6)*3,.6,10-Math.floor(decor/6)*3);toast('נוסף עיצוב חדש למסעדה');sync();renderPanel('shop')}
 function sync(){document.getElementById('money').textContent=money;document.getElementById('xp').textContent=xp;document.getElementById('lvl').textContent=level;document.getElementById('fill').style.width=Math.min(100,xp/(level*100)*100)+'%';}
 function toast(s){const e=document.getElementById('toast');e.textContent=s;e.classList.add('show');clearTimeout(window.tt);window.tt=setTimeout(()=>e.classList.remove('show'),1900)}
-function move(){if(!chef)return;const sp=.11*(staff?1.08:1);chef.position.x+=keys.x*sp;chef.position.z+=keys.z*sp;chef.position.x=Math.max(-14,Math.min(14,chef.position.x));chef.position.z=Math.max(-10,Math.min(13,chef.position.z));camera.position.x+=(chef.position.x+12-camera.position.x)*.035;camera.position.z+=(chef.position.z+15-camera.position.z)*.035;camera.lookAt(chef.position.x,0,chef.position.z);scene.traverse(o=>{if(o.userData&&o.userData.speed){o.position.x+=o.userData.speed;if(o.position.x>9)o.position.x=-9}})}
+function move(){if(!chef)return;const sp=.11*(staff?1.08:1);chef.position.x+=keys.x*sp;chef.position.z+=keys.z*sp;chef.position.x=Math.max(-14,Math.min(14,chef.position.x));chef.position.z=Math.max(-1,Math.min(14,chef.position.z));camera.position.x+=(chef.position.x+10-camera.position.x)*.035;camera.position.z+=(chef.position.z+15-camera.position.z)*.035;camera.lookAt(chef.position.x,.4,chef.position.z);}
 const stick=document.getElementById('stick'),knob=document.getElementById('knob');let sid=null;
 function pointer(e){const r=stick.getBoundingClientRect();let x=e.clientX-r.left-r.width/2,z=e.clientY-r.top-r.height/2,l=Math.hypot(x,z),m=43;if(l>m){x=x/l*m;z=z/l*m}knob.style.transform='translate('+x+'px,'+z+'px)';keys.x=x/m;keys.z=z/m}
 stick.addEventListener('pointerdown',e=>{sid=e.pointerId;stick.setPointerCapture(sid);pointer(e)});stick.addEventListener('pointermove',e=>{if(e.pointerId===sid)pointer(e)});stick.addEventListener('pointerup',()=>{sid=null;knob.style.transform='';keys.x=keys.z=0});
