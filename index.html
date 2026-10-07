@@ -1,17 +1,48 @@
-<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>השף הגדול</title><link rel="stylesheet" href="styles.css"></head><body><canvas id="c"></canvas><header><span>💰 <b id="money">8420</b> ₪</span><span>⭐ <b id="xp">0</b></span><span>🏆 <b id="lvl">1</b></span><button id="sound">🔊</button></header><div id="orders"></div><div id="actions"></div><div id="joy"><i></i></div><nav><button data-p="rest">🍴<small>מסעדה</small></button><button data-p="orders">📋<small>הזמנות</small></button><button data-p="up">⬆️<small>שדרוגים</small></button><button data-p="staff">👥<small>צוות</small></button></nav><section id="panel"></section><div id="engine-error" style="display:none;position:fixed;inset:0;z-index:99;background:#140e0a;color:#fff;place-content:center;text-align:center;padding:28px;font-family:system-ui"><div><div style="font-size:48px">🍽️</div><h2>השף הגדול</h2><p>לא הצלחנו לטעון את מנוע התלת־ממד. נסה לרענן את המשחק.</p><button onclick="location.reload()" style="padding:12px 22px;border:0;border-radius:12px">רענון</button></div></div><script>
-function startGame(){
-  if(window.__gameStarted)return;
-  window.__gameStarted=true;
-  var s=document.createElement('script');
-  s.src='game.js';
-  s.onerror=function(){document.getElementById('engine-error').style.display='grid'};
-  document.body.appendChild(s);
-}
-function loadFallback(){
-  var s=document.createElement('script');
-  s.src='https://unpkg.com/three@0.180.0/build/three.min.js';
-  s.onload=startGame;
-  s.onerror=function(){document.getElementById('engine-error').style.display='grid'};
-  document.head.appendChild(s);
-}
-</script><script src="https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.min.js" onload="startGame()" onerror="loadFallback()"></script></body></html>
+<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><title>השף הגדול</title><link rel="stylesheet" href="styles.css"></head><body><canvas id="c"></canvas><header><span>💰 <b id="money">8420</b> ₪</span><span>⭐ <b id="xp">0</b></span><span>🏆 <b id="lvl">1</b></span><button id="sound">🔊</button></header><div id="orders"></div><div id="actions"></div><div id="joy"><i></i></div><nav><button data-p="rest">🍴<small>מסעדה</small></button><button data-p="orders">📋<small>הזמנות</small></button><button data-p="up">⬆️<small>שדרוגים</small></button><button data-p="staff">👥<small>צוות</small></button></nav><section id="panel"></section><div id="engine-error" style="display:none;position:fixed;inset:0;z-index:99;background:#140e0a;color:#fff;place-content:center;text-align:center;padding:28px;font-family:system-ui"><div><div style="font-size:48px">🍽️</div><h2>השף הגדול</h2><p id="engine-message">לא הצלחנו לטעון את מנוע התלת־ממד.</p><button onclick="location.reload()" style="padding:12px 22px;border:0;border-radius:12px">רענון</button></div></div><script>
+(function(){
+  var errorBox=document.getElementById('engine-error');
+  var message=document.getElementById('engine-message');
+  var started=false;
+  window.addEventListener('error',function(e){
+    if(!window.THREE && e && e.message) {
+      message.textContent='שגיאה בטעינת מנוע התלת־ממד: '+e.message;
+      errorBox.style.display='grid';
+    }
+  });
+  window.addEventListener('unhandledrejection',function(e){
+    if(!window.THREE) {
+      message.textContent='שגיאה בטעינת מנוע התלת־ממד.';
+      errorBox.style.display='grid';
+    }
+  });
+  function startGame(){
+    if(started || !window.THREE) return;
+    started=true;
+    var s=document.createElement('script');
+    s.src='game.js?v=32';
+    s.onerror=function(){
+      started=false;
+      message.textContent='מנוע התלת־ממד נטען, אבל המשחק עצמו לא נטען.';
+      errorBox.style.display='grid';
+    };
+    document.body.appendChild(s);
+  }
+  function loadThree(url){
+    var s=document.createElement('script');
+    s.type='module';
+    s.textContent="import * as THREE from '"+url+"'; window.THREE=THREE; window.dispatchEvent(new Event('three-ready'));";
+    document.head.appendChild(s);
+  }
+  window.addEventListener('three-ready',startGame);
+  loadThree('https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js');
+  setTimeout(function(){
+    if(!window.THREE && !started) loadThree('https://unpkg.com/three@0.180.0/build/three.module.js');
+  },5000);
+  setTimeout(function(){
+    if(!window.THREE && !started){
+      message.textContent='לא ניתן לטעון את Three.js. בדוק חיבור לאינטרנט ונסה שוב.';
+      errorBox.style.display='grid';
+    }
+  },12000);
+})();
+</script></body></html>
