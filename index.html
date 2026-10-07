@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="he" dir="rtl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>השף הגדול</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;height:100%;overflow:hidden;background:#18202b;font-family:Arial,sans-serif;touch-action:none}#g{position:fixed;inset:0}canvas{display:block}
+#hud{position:fixed;top:10px;left:10px;right:10px;z-index:4;display:flex;gap:7px;justify-content:flex-start;direction:rtl;pointer-events:none}.pill{background:#101722e8;color:white;padding:9px 12px;border-radius:16px;font-weight:800;border:1px solid #ffffff1f;backdrop-filter:blur(8px)}
+#menu{position:fixed;right:10px;top:10px;z-index:8;display:flex;gap:6px}button{border:0;border-radius:15px;padding:11px 13px;font-weight:800;font-size:14px;background:white;color:#18202b;box-shadow:0 6px 20px #0004}button:active{transform:scale(.96)}
+#orders{position:fixed;right:10px;top:58px;width:min(340px,calc(100vw - 20px));max-height:52vh;overflow:auto;z-index:7;background:#fffffff2;border-radius:20px;padding:10px;box-shadow:0 18px 50px #0005}.o{display:flex;align-items:center;gap:9px;background:#f1f4f7;padding:9px;border-radius:13px;margin:6px 0}.o b{flex:1}.o small{display:block;color:#657184}.o button{background:#e65a31;color:#fff;padding:8px 10px}
+#actions{position:fixed;bottom:12px;left:12px;right:12px;z-index:5;display:flex;justify-content:center;gap:7px}.act{background:#fff;min-width:76px;text-align:center}.act em{font-style:normal;font-size:20px;display:block}.act span{font-size:11px}
+#toast{position:fixed;bottom:92px;left:50%;transform:translateX(-50%);z-index:20;background:#111827eF;color:#fff;border-radius:18px;padding:11px 17px;font-weight:800;opacity:0;transition:.2s;white-space:nowrap}.show{opacity:1!important}
+#start{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#17202c,#34495e);padding:20px}.card{width:min(440px,100%);background:#fff;border-radius:30px;padding:28px 22px;text-align:center;box-shadow:0 30px 80px #0007}.logo{font-size:70px}.card h1{margin:5px 0;font-size:33px}.card p{color:#657184;line-height:1.5}.primary{width:100%;background:#e65a31;color:#fff;font-size:17px;padding:15px}
+#level{position:fixed;top:60px;left:10px;z-index:4;width:145px;height:7px;border-radius:10px;background:#ffffff40;overflow:hidden}.fill{height:100%;width:0;background:#f6c453}
+#stick{position:fixed;bottom:18px;right:18px;width:118px;height:118px;border-radius:50%;z-index:6;background:#ffffff22;border:2px solid #fff6}.knob{position:absolute;width:52px;height:52px;border-radius:50%;left:31px;top:31px;background:#ffffffd9;box-shadow:0 4px 18px #0004}
+#cook{position:fixed;inset:0;z-index:25;display:none;align-items:center;justify-content:center;background:#0008}.cookcard{background:white;border-radius:25px;padding:24px;width:min(380px,90%);text-align:center}.bar{height:12px;background:#e9edf1;border-radius:10px;overflow:hidden;margin:15px 0}.bar i{display:block;height:100%;width:0;background:#e65a31}
+@media(min-width:700px){#stick{right:35px}}
+</style></head><body>
+<div id="g"></div><div id="start"><div class="card"><div class="logo">👨‍🍳</div><h1>השף הגדול</h1><p>בנה את המסעדה שלך, קבל לקוחות, בשל הזמנות, הרווח כסף והפוך לשף הטוב בעיר.</p><button class="primary" onclick="start()">פתח מסעדה</button></div></div>
+<div id="hud"><div class="pill">💰 <span id="money">120</span></div><div class="pill">⭐ <span id="xp">0</span></div><div class="pill">🏆 רמה <span id="lvl">1</span></div><div class="pill">👥 <span id="guests">0</span></div></div>
+<div id="level"><div class="fill" id="fill"></div></div><div id="menu"><button onclick="toggleOrders()">🍽️ הזמנות</button><button onclick="upgrade()">⬆️ שדרוג</button></div>
+<div id="orders"></div><div id="actions"><button class="act" onclick="interact()"><em>🍳</em><span>בשל</span></button><button class="act" onclick="hire()"><em>🧑‍🍳</em><span>עובד</span></button><button class="act" onclick="decorate()"><em>🪑</em><span>עיצוב</span></button></div>
+<div id="stick"><div class="knob" id="knob"></div></div><div id="toast"></div>
+<div id="cook"><div class="cookcard"><div style="font-size:45px">🍳</div><h2 id="cookTitle">מבשלים...</h2><div class="bar"><i id="cookBar"></i></div><button onclick="finishCook()">הגשה עכשיו</button></div></div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script>
+let scene,camera,renderer,chef,clock,started=false,money=120,xp=0,level=1,staff=0,decor=0,orders=[],cooking=false,cookOrder=null;
+const keys={x:0,z:0}; const dishes=[['🍔','המבורגר',28],['🍕','פיצה',34],['🍝','פסטה',31],['🥗','סלט',22],['🍰','עוגה',38],['🍗','עוף צלוי',42]];
+function box(w,h,d,c,x,y,z){let m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color:c,roughness:.75}));m.position.set(x,y,z);scene.add(m);return m}
+function init(){
+ scene=new THREE.Scene();scene.background=new THREE.Color(0x9dc6df);scene.fog=new THREE.Fog(0x9dc6df,35,80);
+ camera=new THREE.PerspectiveCamera(48,innerWidth/innerHeight,.1,150);camera.position.set(11,18,19);camera.lookAt(0,0,0);
+ renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;document.getElementById('g').appendChild(renderer.domElement);
+ scene.add(new THREE.HemisphereLight(0xffffff,0x657060,2.1));let sun=new THREE.DirectionalLight(0xffffff,2);sun.position.set(10,25,10);sun.castShadow=true;scene.add(sun);
+ box(50,.4,50,0x6d9b52,0,-.25,0);box(22,.25,10,0xd7b892,0,-.05,5);box(10,.26,30,0xd7b892,-2,-.04,0);
+ // restaurant
+ box(14,3,8,0xf1eee7,0,1.5,-8);box(15,.35,9,0x9d3e2b,0,3.2,-8);
+ box(4,2.8,.35,0x83b6d1,0,1.5,-3.9);box(2.5,2.8,.35,0x83b6d1,-4,1.5,-3.9);box(2.5,2.8,.35,0x83b6d1,4,1.5,-3.9);
+ // kitchen
+ box(8,1,2,0x777d86,0,1,-7);box(2,1,2,0x555b64,-3,1,-5.8);box(2,1,2,0x555b64,3,1,-5.8);
+ // tables
+ for(let x=-8;x<=8;x+=4) for(let z=2;z<=8;z+=4){box(2,.25,1.4,0x8a583d,x,.9,z);for(let dx of [-.7,.7])for(let dz of [-.4,.4])box(.18,.8,.18,0x593a29,x+dx,.4,z+dz)}
+ // entrance
+ box(4,3,.35,0x33383e,0,1.5,9);
+ chef=new THREE.Mesh(new THREE.CapsuleGeometry(.45,1,5,10),new THREE.MeshStandardMaterial({color:0xf2c7a5}));chef.position.set(0,1,4);scene.add(chef);
+ let hat=new THREE.Mesh(new THREE.CylinderGeometry(.55,.55,.3,16),new THREE.MeshStandardMaterial({color:0xffffff}));hat.position.y=1.75;chef.add(hat);
+ for(let i=0;i<8;i++){let g=new THREE.Mesh(new THREE.SphereGeometry(.25,8,8),new THREE.MeshStandardMaterial({color:0x4f6b3d}));g.position.set(-18+i*5,.3,13);scene.add(g)}
+ window.addEventListener('resize',resize);animate();spawnOrder();
+}
+function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}
+function start(){document.getElementById('start').style.display='none';started=true;init();toast('המסעדה נפתחה! קבל את ההזמנה הראשונה.')}
+function spawnOrder(){if(!started||orders.length>=5)return;let d=dishes[Math.floor(Math.random()*dishes.length)];orders.push({id:Date.now()+Math.random(),dish:d,tip:Math.floor(Math.random()*12),time:Date.now()});renderOrders();document.getElementById('guests').textContent=orders.length;setTimeout(spawnOrder,3000+Math.random()*4000)}
+function renderOrders(){let el=document.getElementById('orders');el.innerHTML=orders.map(o=>'<div class="o"><span class="ico">'+o.dish[0]+'</span><b>'+o.dish[1]+'<small>תשלום: ₪'+(o.dish[2]+o.tip)+'</small></b><button onclick="cook('+o.id+')">בשל</button></div>').join('')}
+function toggleOrders(){let e=document.getElementById('orders');e.style.display=e.style.display==='none'?'block':'none'}document.getElementById('orders').style.display='none';
+function cook(id){if(cooking)return;let o=orders.find(x=>x.id==id);if(!o)return;cooking=true;cookOrder=o;document.getElementById('cook').style.display='flex';document.getElementById('cookTitle').textContent='מכין '+o.dish[1];let t=0;window.ct=setInterval(()=>{t+=4;document.getElementById('cookBar').style.width=t+'%';if(t>=100)finishCook()},120)}
+function finishCook(){if(!cooking)return;clearInterval(window.ct);let o=cookOrder;orders=orders.filter(x=>x.id!==o.id);money+=o.dish[2]+o.tip;xp+=10+o.tip;while(xp>=level*100){xp-=level*100;level++;money+=50;toast('עלית לרמה '+level+'! +₪50')}cooking=false;document.getElementById('cook').style.display='none';document.getElementById('cookBar').style.width='0';renderOrders();sync();toast('הוגש '+o.dish[1]+'! +₪'+(o.dish[2]+o.tip))}
+function sync(){document.getElementById('money').textContent=money;document.getElementById('xp').textContent=xp;document.getElementById('lvl').textContent=level;document.getElementById('fill').style.width=Math.min(100,xp/(level*100)*100)+'%';document.getElementById('guests').textContent=orders.length}
+function upgrade(){let cost=150+level*80;if(money<cost)return toast('צריך ₪'+cost+' לשדרוג');money-=cost;xp+=30;toast('המסעדה שודרגה! הלקוחות מרוצים יותר.');sync()}
+function hire(){let cost=100+staff*80;if(money<cost)return toast('צריך ₪'+cost);money-=cost;staff++;toast('העסקת עובד חדש 👨‍🍳');sync()}
+function decorate(){let cost=60+decor*30;if(money<cost)return toast('צריך ₪'+cost);money-=cost;decor++;box(1.2,.9,1.2,0xc98b5b,-7+decor%5,1,1+Math.floor(decor/5)*3);toast('נוסף פריט עיצוב!');sync()}
+function interact(){if(orders.length) cook(orders[0].id);else toast('אין כרגע הזמנה. המתן ללקוחות.')}
+function toast(s){let e=document.getElementById('toast');e.textContent=s;e.classList.add('show');clearTimeout(window.tt);window.tt=setTimeout(()=>e.classList.remove('show'),1800)}
+function move(){if(!chef)return;let sp=.12*(staff?1.08:1);chef.position.x+=keys.x*sp;chef.position.z+=keys.z*sp;chef.position.x=Math.max(-15,Math.min(15,chef.position.x));chef.position.z=Math.max(-10,Math.min(14,chef.position.z));camera.position.x+=(chef.position.x+11-camera.position.x)*.04;camera.position.z+=(chef.position.z+15-camera.position.z)*.04;camera.lookAt(chef.position.x,0,chef.position.z)}
+const stick=document.getElementById('stick'),knob=document.getElementById('knob');let sid=null;function pointer(e){let r=stick.getBoundingClientRect(),x=e.clientX-r.left-r.width/2,z=e.clientY-r.top-r.height/2,l=Math.hypot(x,z),m=45;if(l>m){x=x/l*m;z=z/l*m}knob.style.transform='translate('+x+'px,'+z+'px)';keys.x=x/m;keys.z=z/m}
+stick.addEventListener('pointerdown',e=>{sid=e.pointerId;stick.setPointerCapture(sid);pointer(e)});stick.addEventListener('pointermove',e=>{if(e.pointerId===sid)pointer(e)});stick.addEventListener('pointerup',()=>{sid=null;knob.style.transform='';keys.x=keys.z=0});
+function animate(){requestAnimationFrame(animate);move();if(renderer)renderer.render(scene,camera)}sync();
+</script></body></html>
