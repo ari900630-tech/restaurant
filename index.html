@@ -50,6 +50,30 @@ button{font:inherit;border:0;cursor:pointer}.game{position:fixed;inset:0}.game c
 <div id="stick"><div id="knob" class="knob"></div></div><div id="toast"></div>
 <div id="cook"><div class="cookcard"><div id="dishbig" class="dishbig">🍳</div><h2 id="cookTitle">מכינים...</h2><div class="cookbar"><i id="cookBar"></i></div><button class="serve" onclick="finishCook()">הגשה עכשיו</button></div></div>
 
+<script>
+(function(){
+  function bindStart(){
+    const b=document.getElementById('startBtn');
+    if(!b)return;
+    const go=function(e){
+      if(e){e.preventDefault();e.stopPropagation();}
+      if(typeof window.startGame==='function'){window.startGame(e);}
+      else{
+        b.textContent='טוען את המשחק...';
+        setTimeout(function(){
+          if(typeof window.startGame==='function') window.startGame(e);
+          else { b.disabled=false; b.textContent='נסה שוב'; }
+        },250);
+      }
+    };
+    b.addEventListener('pointerup',go,true);
+    b.addEventListener('touchend',go,{capture:true,passive:false});
+    b.addEventListener('click',go,true);
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bindStart);
+  else bindStart();
+})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script>
 let scene,camera,renderer,chef,started=false,money=120,xp=0,level=1,staff=0,decor=0,orders=[],cooking=false,cookOrder=null,ct;
@@ -79,7 +103,7 @@ function init(){
  window.addEventListener('resize',resize);animate();setTimeout(spawnOrder,1200);
 }
 function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}
-function startGame(event){if(event){event.preventDefault();event.stopPropagation();}const btn=document.getElementById('startBtn');if(started)return;btn.disabled=true;btn.textContent='פותח את המסעדה...';if(typeof THREE==='undefined'){btn.disabled=false;btn.textContent='נסה שוב';return toast('המשחק עדיין נטען — נסה שוב בעוד רגע');}try{document.getElementById('start').style.display='none';started=true;init();toast('המסעדה נפתחה! הלקוח הראשון נכנס.');renderPanel('orders')}catch(e){started=false;document.getElementById('start').style.display='grid';btn.disabled=false;btn.textContent='נסה שוב';toast('אירעה תקלה בפתיחת המשחק')}}
+function startGame(event){if(event){event.preventDefault();event.stopPropagation();}const btn=document.getElementById('startBtn');if(!btn)return;if(started)return;btn.disabled=true;btn.textContent='פותח את המסעדה...';if(typeof THREE==='undefined'){btn.disabled=false;btn.textContent='נסה שוב';return toast('המשחק עדיין נטען — נסה שוב בעוד רגע');}try{document.getElementById('start').style.display='none';started=true;init();toast('המסעדה נפתחה! הלקוח הראשון נכנס.');renderPanel('orders')}catch(e){started=false;document.getElementById('start').style.display='grid';btn.disabled=false;btn.textContent='נסה שוב';toast('אירעה תקלה בפתיחת המשחק')}}
 function spawnOrder(){if(!started)return;if(orders.length<5){const d=dishes[Math.floor(Math.random()*dishes.length)];orders.push({id:Date.now()+Math.random(),dish:d,tip:Math.floor(Math.random()*12)});sync()}renderPanel('orders');setTimeout(spawnOrder,4500+Math.random()*3500)}
 function openPanel(type){renderPanel(type);document.getElementById('panel').classList.add('show')}
 function closePanel(){document.getElementById('panel').classList.remove('show')}
